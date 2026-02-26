@@ -1,0 +1,109 @@
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════════
+   SonicVault Design System — "Obsidian Audio"
+   ═══════════════════════════════════════════════════════ */
+
+@theme {
+  /* ── Surface (Background) Colors ── */
+  --color-surface: #0A0A0C;
+  --color-surface-secondary: #111115;
+  --color-surface-tertiary: #1A1A21;
+  --color-surface-elevated: #222230;
+
+  /* ── Accent — Warm Amber/Gold (Tube Amplifier Glow) ── */
+  --color-accent: #E8A849;
+  --color-accent-dark: #D4872A;
+
+  /* ── Foreground (Text) Colors ── */
+  --color-foreground: #F0EDE6;
+  --color-foreground-secondary: #8A8694;
+  --color-foreground-tertiary: #5A5666;
+
+  /* ── Semantic Colors ── */
+  --color-success: #4ADE80;
+  --color-warning: #FBBF24;
+  --color-error: #F87171;
+
+  /* ── Glass & Border ── */
+  --color-glass: rgba(255, 255, 255, 0.03);
+  --color-border-subtle: rgba(255, 255, 255, 0.06);
+
+  /* ── Font Families ── */
+  --font-sans: var(--font-dm-sans), 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-dm-serif), 'DM Serif Display', ui-serif, Georgia, serif;
+  --font-mono: var(--font-dm-mono), 'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* ── Additional CSS Variables (non-Tailwind) ── */
+:root {
+  --shadow-deep: 0 24px 48px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 20px rgba(232, 168, 73, 0.15);
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.3);
+  --accent-glow: rgba(232, 168, 73, 0.15);
+}
+
+/* ── Custom Scrollbar ── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-foreground-tertiary);
+  border-radius: 3px;
+  transition: background 0.2s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent);
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-foreground-tertiary) transparent;
+}
+
+/* ── Text Selection ── */
+::selection {
+  background: rgba(232, 168, 73, 0.3);
+  color: var(--color-foreground);
+}
+
+/* ── Smooth Scrolling ── */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ── Body Base ── */
+body {
+  background-color: var(--color-surface);
+  color: var(--color-foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Animations ── */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s ease-in-out infinite;
+  background-size: 200% 100%;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}

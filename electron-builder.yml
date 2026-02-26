@@ -1,0 +1,35 @@
+appId: com.sonicvault.app
+productName: SonicVault
+copyright: Copyright © 2024 SonicVault
+
+directories:
+  output: release
+  buildResources: resources
+
+files:
+  - from: .
+    filter:
+      - package.json
+      - main
+  - from: renderer/.next/standalone
+    to: renderer
+  - from: renderer/.next/static
+    to: renderer/.next/static
+  - from: renderer/public
+    to: renderer/public
+
+mac:
+  target:
+    - dmg
+    - zip
+  category: public.app-category.music
+
+win:
+  target:
+    - nsis
+    - portable
+
+linux:
+  target:
+    - AppImage
+    - deb

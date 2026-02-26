@@ -1,0 +1,32 @@
+services:
+  sonicvault:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: sonicvault
+    ports:
+      - "3000:3000"
+    volumes:
+      # Persistent data (SQLite DB, cover art cache)
+      - sonicvault-data:/data
+      # Your organized music library output
+      - /path/to/library:/music/library
+      # Source folders to scan (add as many as needed)
+      - /path/to/downloads:/music/sources/downloads
+      # - /path/to/nas/music:/music/sources/nas
+    environment:
+      - DATA_PATH=/data
+      - LIBRARY_PATH=/music/library
+      # Optional: API keys for enrichment
+      - FANART_API_KEY=
+      - ACOUSTID_API_KEY=
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/library/stats"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+
+volumes:
+  sonicvault-data:
