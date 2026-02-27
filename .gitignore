@@ -43,6 +43,11 @@ Thumbs.db
 release/
 app/
 
+# AI / Claude Code
+.claude/
+Anweisungen.md
+CLAUDE.md
+
 # Misc
 *.tsbuildinfo
 next-env.d.ts

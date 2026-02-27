@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+
+# Next.js build output
+renderer/.next/
+renderer/out/
+
+# Runtime data
+data/
+*.db
+*.db-journal
+*.db-wal
+
+# Environment (secrets)
+.env
+.env.local
+.env.*.local
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Electron / Desktop build
+release/
+dist/
+build/
+app/
+main/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Misc
+*.tsbuildinfo
+*.log
+.claude/

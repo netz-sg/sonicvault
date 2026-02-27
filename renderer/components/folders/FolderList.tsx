@@ -6,11 +6,13 @@ import type { SourceFolder } from '@/components/scanner/types';
 
 interface FolderListProps {
   folders: SourceFolder[];
-  scanningFolderId: string | null;
-  onScan: (folderId: string) => void;
-  onDelete: (folderId: string) => void;
+  scanningFolderId?: string | null;
+  onScan?: (folderId: string) => void;
+  onDelete?: (folderId: string) => void;
   onToggleAutoScan?: (folderId: string, enabled: boolean) => void;
   onToggleAutoOrganize?: (folderId: string, enabled: boolean) => void;
+  emptyMessage?: string;
+  emptySubMessage?: string;
 }
 
 export function FolderList({
@@ -20,14 +22,16 @@ export function FolderList({
   onDelete,
   onToggleAutoScan,
   onToggleAutoOrganize,
+  emptyMessage = 'No source folders added yet',
+  emptySubMessage = 'Add a folder to get started',
 }: FolderListProps) {
   if (folders.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-border-subtle p-8 text-center">
         <FolderOpen className="w-8 h-8 text-foreground-tertiary mx-auto mb-3" />
-        <p className="text-sm text-foreground-secondary">No source folders added yet</p>
+        <p className="text-sm text-foreground-secondary">{emptyMessage}</p>
         <p className="text-xs text-foreground-tertiary mt-1">
-          Add a folder above or use Quick Scan to get started
+          {emptySubMessage}
         </p>
       </div>
     );
@@ -66,25 +70,29 @@ export function FolderList({
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0">
-                  <button
-                    onClick={() => onScan(folder.id)}
-                    disabled={isScanning}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-accent/10 text-accent hover:bg-accent/20 transition-colors disabled:opacity-50"
-                  >
-                    {isScanning ? (
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    ) : (
-                      <ScanSearch className="w-3.5 h-3.5" />
-                    )}
-                    {isScanning ? 'Scanning...' : 'Scan'}
-                  </button>
-                  <button
-                    onClick={() => onDelete(folder.id)}
-                    disabled={isScanning}
-                    className="p-1.5 rounded-lg text-foreground-tertiary hover:text-error hover:bg-error/10 opacity-0 group-hover:opacity-100 transition-all disabled:opacity-0"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                  {onScan && (
+                    <button
+                      onClick={() => onScan(folder.id)}
+                      disabled={isScanning}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-accent/10 text-accent hover:bg-accent/20 transition-colors disabled:opacity-50"
+                    >
+                      {isScanning ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <ScanSearch className="w-3.5 h-3.5" />
+                      )}
+                      {isScanning ? 'Scanning...' : 'Scan'}
+                    </button>
+                  )}
+                  {onDelete && (
+                    <button
+                      onClick={() => onDelete(folder.id)}
+                      disabled={isScanning}
+                      className="p-1.5 rounded-lg text-foreground-tertiary hover:text-error hover:bg-error/10 opacity-0 group-hover:opacity-100 transition-all disabled:opacity-0"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  )}
                 </div>
               </div>
 

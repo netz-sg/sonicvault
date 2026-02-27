@@ -1,31 +1,62 @@
+# ════════════════════════════════════════════════════════════════
+# SonicVault — Docker Compose
+# ════════════════════════════════════════════════════════════════
+#
+# Quick start:
+#   1. Copy .env.example to .env and adjust paths
+#   2. Uncomment/add your source folder volume mounts below
+#   3. docker compose up -d
+#
+# IMPORTANT — Volume Mounts:
+#   The container has its own Linux filesystem. Your host folders
+#   must be mounted as volumes. Inside the app, use the CONTAINER
+#   paths (right side of the colon), NOT your host paths.
+#
+#   Example:
+#     - C:\Users\you\Music:/music/library       (host:container)
+#     - /nas/downloads:/music/sources/downloads  (host:container)
+#
+#   In the SonicVault UI, set:
+#     Library Path:   /music/library
+#     Source Folder:  /music/sources/downloads
+#
+# ════════════════════════════════════════════════════════════════
+
 services:
   sonicvault:
     build:
       context: ..
       dockerfile: docker/Dockerfile
+    image: sonicvault:latest
     container_name: sonicvault
     ports:
-      - "3000:3000"
+      - "${PORT:-3000}:3000"
     volumes:
-      # Persistent data (SQLite DB, cover art cache)
+      # Persistent data (SQLite DB, cover art cache) — do NOT change
       - sonicvault-data:/data
-      # Your organized music library output
-      - /path/to/library:/music/library
-      # Source folders to scan (add as many as needed)
-      - /path/to/downloads:/music/sources/downloads
+
+      # Organized music library output
+      # Left side = your HOST path, right side = container path
+      - ${LIBRARY_PATH:-./library}:/music/library
+
+      # Source folders to scan — add your music folders here
+      # The container path must start with /music/sources/
+      # In the SonicVault Scanner UI, add: /music/sources/<name>
+      #
+      # - /path/to/your/downloads:/music/sources/downloads
       # - /path/to/nas/music:/music/sources/nas
+      # - D:\Music\Collection:/music/sources/collection
     environment:
       - DATA_PATH=/data
       - LIBRARY_PATH=/music/library
-      # Optional: API keys for enrichment
-      - FANART_API_KEY=
-      - ACOUSTID_API_KEY=
+      - FANART_API_KEY=${FANART_API_KEY:-}
+      - ACOUSTID_API_KEY=${ACOUSTID_API_KEY:-}
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/api/library/stats"]
       interval: 30s
       timeout: 5s
-      start_period: 10s
+      start_period: 15s
       retries: 3
 
 volumes:

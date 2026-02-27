@@ -25,19 +25,33 @@ export function ExecuteProgress({ currentStep }: ExecuteProgressProps) {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-xl border border-accent/20 bg-surface-secondary p-5"
+      className="rounded-xl border border-accent/20 overflow-hidden"
+      style={{
+        background: 'linear-gradient(180deg, #111115 0%, #0E0E12 100%)',
+        padding: '1.25rem',
+      }}
     >
       {/* Steps */}
-      <div className="space-y-2 mb-4">
+      <div className="flex flex-col gap-2 mb-4">
         {STEPS.map((step, i) => {
           const isDone = i < currentIndex;
           const isActive = i === currentIndex;
 
           return (
             <div key={step.id} className="flex items-center gap-3">
-              <div className="w-5 h-5 flex items-center justify-center shrink-0">
+              <div className="flex items-center justify-center shrink-0" style={{ width: '1.25rem', height: '1.25rem' }}>
                 {isDone ? (
-                  <Check className="w-4 h-4 text-accent" />
+                  <div
+                    className="rounded flex items-center justify-center"
+                    style={{
+                      width: '1.25rem',
+                      height: '1.25rem',
+                      background: 'rgba(232,168,73,0.1)',
+                      border: '1px solid rgba(232,168,73,0.15)',
+                    }}
+                  >
+                    <Check className="w-3 h-3 text-accent" />
+                  </div>
                 ) : isActive ? (
                   <Loader2 className="w-4 h-4 text-accent animate-spin" />
                 ) : (
@@ -57,17 +71,17 @@ export function ExecuteProgress({ currentStep }: ExecuteProgressProps) {
       </div>
 
       {/* Progress bar */}
-      <div className="h-1.5 rounded-full bg-surface-tertiary overflow-hidden">
+      <div className="h-1 rounded-full bg-surface-tertiary overflow-hidden">
         <motion.div
           className="h-full rounded-full bg-linear-to-r from-accent-dark to-accent"
           initial={{ width: '0%' }}
           animate={{ width: `${progress}%` }}
           transition={{ duration: 0.4, ease: 'easeOut' }}
-          style={{ boxShadow: '0 0 12px var(--color-accent)' }}
+          style={{ boxShadow: '0 0 12px rgba(232,168,73,0.3)' }}
         />
       </div>
 
-      <p className="text-xs text-foreground-tertiary mt-3">
+      <p className="text-xs text-foreground-tertiary mt-3 font-mono tabular-nums">
         Step {currentIndex + 1} of {STEPS.length}
       </p>
     </motion.div>

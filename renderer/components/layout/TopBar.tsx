@@ -4,22 +4,24 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronRight, ScanSearch } from 'lucide-react';
 import { SearchInput } from '@/components/ui/SearchInput';
-
-const routeLabels: Record<string, string> = {
-  '': 'Dashboard',
-  artists: 'Artists',
-  albums: 'Albums',
-  scan: 'Scanner',
-  organize: 'Organizer',
-  settings: 'Settings',
-};
+import { useTranslation } from '@/lib/i18n/useTranslation';
 
 export function TopBar() {
   const pathname = usePathname();
+  const { t } = useTranslation();
   const segments = pathname.split('/').filter(Boolean);
 
+  const routeLabels: Record<string, string> = {
+    '': t('nav.dashboard'),
+    artists: t('nav.artists'),
+    albums: t('nav.albums'),
+    scan: t('nav.scanner'),
+    organize: t('topbar.organizer'),
+    settings: t('nav.settings'),
+  };
+
   const breadcrumbs = [
-    { label: 'Dashboard', href: '/' },
+    { label: t('nav.dashboard'), href: '/' },
     ...segments.map((seg, i) => ({
       label: routeLabels[seg] || seg,
       href: '/' + segments.slice(0, i + 1).join('/'),
@@ -65,7 +67,7 @@ export function TopBar() {
       {/* Right side: Search + Actions */}
       <div className="flex items-center gap-4">
         <SearchInput
-          placeholder="Search library..."
+          placeholder={t('topbar.search')}
           className="w-64"
         />
         <Link
@@ -73,7 +75,7 @@ export function TopBar() {
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-accent/10 text-accent text-sm font-medium hover:bg-accent/20 transition-colors"
         >
           <ScanSearch className="w-4 h-4" />
-          <span className="hidden lg:inline">Scan</span>
+          <span className="hidden lg:inline">{t('topbar.scan')}</span>
         </Link>
       </div>
     </header>

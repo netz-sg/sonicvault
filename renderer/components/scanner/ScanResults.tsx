@@ -27,28 +27,50 @@ export function ScanResults({ result }: ScanResultsProps) {
       variants={stagger}
       initial="hidden"
       animate="show"
-      className="space-y-4"
+      className="flex flex-col"
+      style={{ gap: '1rem' }}
     >
       {/* Summary Banner */}
       <motion.div
         variants={fadeUp}
-        className={`rounded-xl border p-5 ${
-          isSuccess
-            ? 'border-success/20 bg-success/5'
-            : 'border-border-subtle bg-surface-secondary'
+        className={`relative rounded-xl border overflow-hidden ${
+          isSuccess ? 'border-success/20' : 'border-border-subtle'
         }`}
+        style={{
+          background: 'linear-gradient(180deg, #111115 0%, #0E0E12 100%)',
+          padding: '1.25rem',
+        }}
       >
-        <div className="flex items-center gap-3">
-          <CheckCircle2
-            className={`w-5 h-5 ${isSuccess ? 'text-success' : 'text-foreground-tertiary'}`}
+        {isSuccess && (
+          <div
+            className="absolute left-0 top-0 bottom-0"
+            style={{
+              width: '3px',
+              background: 'linear-gradient(to bottom, rgba(34,197,94,0.5) 0%, rgba(34,197,94,0.1) 100%)',
+            }}
           />
+        )}
+        <div className="flex items-center gap-3">
+          <div
+            className="rounded-lg flex items-center justify-center shrink-0"
+            style={{
+              width: '2.25rem',
+              height: '2.25rem',
+              background: isSuccess ? 'rgba(34,197,94,0.06)' : 'rgba(255,255,255,0.03)',
+              border: isSuccess ? '1px solid rgba(34,197,94,0.1)' : '1px solid rgba(255,255,255,0.06)',
+            }}
+          >
+            <CheckCircle2
+              className={`w-4 h-4 ${isSuccess ? 'text-success' : 'text-foreground-tertiary'}`}
+            />
+          </div>
           <div>
-            <h3 className="text-sm font-medium text-foreground">
-              Scan complete
-            </h3>
+            <h3 className="text-sm font-medium text-foreground">Scan complete</h3>
             <p className="text-xs text-foreground-secondary mt-0.5">
-              {result.audioFiles} audio file{result.audioFiles !== 1 ? 's' : ''} found
-              {result.skipped > 0 && `, ${result.skipped} already in library`}
+              <span className="font-mono tabular-nums">{result.audioFiles}</span> audio file{result.audioFiles !== 1 ? 's' : ''} found
+              {result.skipped > 0 && (
+                <>, <span className="font-mono tabular-nums">{result.skipped}</span> already in library</>
+              )}
             </p>
           </div>
         </div>
@@ -56,50 +78,36 @@ export function ScanResults({ result }: ScanResultsProps) {
 
       {/* Stats Grid */}
       <motion.div variants={fadeUp} className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <ResultCard
-          icon={Mic2}
-          label="New Artists"
-          value={result.newArtists}
-          accent={result.newArtists > 0}
-        />
-        <ResultCard
-          icon={Disc3}
-          label="New Albums"
-          value={result.newAlbums}
-          accent={result.newAlbums > 0}
-        />
-        <ResultCard
-          icon={Music}
-          label="New Tracks"
-          value={result.newTracks}
-          accent={result.newTracks > 0}
-        />
-        <ResultCard
-          icon={SkipForward}
-          label="Skipped"
-          value={result.skipped}
-          accent={false}
-        />
+        <ResultCard icon={Mic2} label="New Artists" value={result.newArtists} accent={result.newArtists > 0} />
+        <ResultCard icon={Disc3} label="New Albums" value={result.newAlbums} accent={result.newAlbums > 0} />
+        <ResultCard icon={Music} label="New Tracks" value={result.newTracks} accent={result.newTracks > 0} />
+        <ResultCard icon={SkipForward} label="Skipped" value={result.skipped} accent={false} />
       </motion.div>
 
       {/* Errors */}
       {hasErrors && (
         <motion.div
           variants={fadeUp}
-          className="rounded-xl border border-error/20 bg-error/5 p-5"
+          className="relative rounded-xl border border-error/20 overflow-hidden"
+          style={{ background: 'rgba(239,68,68,0.03)', padding: '1.25rem' }}
         >
+          <div
+            className="absolute left-0 top-0 bottom-0"
+            style={{
+              width: '3px',
+              background: 'linear-gradient(to bottom, rgba(239,68,68,0.5) 0%, rgba(239,68,68,0.1) 100%)',
+            }}
+          />
           <div className="flex items-center gap-2 mb-3">
             <AlertCircle className="w-4 h-4 text-error" />
             <h4 className="text-sm font-medium text-error">
               {result.errors.length} error{result.errors.length !== 1 ? 's' : ''}
             </h4>
           </div>
-          <div className="space-y-1.5 max-h-40 overflow-y-auto">
+          <div className="flex flex-col gap-1.5 max-h-40 overflow-y-auto custom-scrollbar">
             {result.errors.map((err, i) => (
               <div key={i} className="text-xs text-foreground-secondary">
-                <span className="font-mono text-foreground-tertiary truncate block">
-                  {err.file}
-                </span>
+                <span className="font-mono text-foreground-tertiary truncate block">{err.file}</span>
                 <span className="text-error/80">{err.error}</span>
               </div>
             ))}
@@ -122,9 +130,22 @@ function ResultCard({
   accent: boolean;
 }) {
   return (
-    <div className="rounded-xl bg-surface-secondary border border-border-subtle p-4">
+    <div
+      className="rounded-xl border border-border-subtle"
+      style={{ background: 'linear-gradient(180deg, #111115 0%, #0E0E12 100%)', padding: '1rem' }}
+    >
       <div className="flex items-center gap-2 mb-2">
-        <Icon className={`w-4 h-4 ${accent ? 'text-accent' : 'text-foreground-tertiary'}`} />
+        <div
+          className="rounded flex items-center justify-center"
+          style={{
+            width: '1.5rem',
+            height: '1.5rem',
+            background: accent ? 'rgba(232,168,73,0.06)' : 'rgba(255,255,255,0.03)',
+            border: accent ? '1px solid rgba(232,168,73,0.08)' : '1px solid rgba(255,255,255,0.06)',
+          }}
+        >
+          <Icon className={`w-3 h-3 ${accent ? 'text-accent/60' : 'text-foreground-tertiary'}`} />
+        </div>
         <span className="text-xs text-foreground-tertiary">{label}</span>
       </div>
       <p className={`text-2xl font-mono font-semibold tabular-nums ${accent ? 'text-accent' : 'text-foreground'}`}>

@@ -71,26 +71,60 @@ export function OperationsHistory({
   const total = history?.total ?? 0;
 
   return (
-    <div className="rounded-xl border border-border-subtle bg-surface-secondary overflow-hidden">
+    <div
+      className="rounded-xl border border-border-subtle overflow-hidden"
+      style={{ background: 'linear-gradient(180deg, #111115 0%, #0E0E12 100%)' }}
+    >
       {/* Header */}
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between p-4 hover:bg-surface-tertiary/50 transition-colors"
+        className="w-full flex items-center justify-between hover:bg-surface-tertiary/30 transition-colors"
+        style={{ padding: '1rem' }}
       >
         <div className="flex items-center gap-3">
-          <History className="w-5 h-5 text-foreground-tertiary" />
+          <div
+            className="rounded-lg flex items-center justify-center shrink-0"
+            style={{
+              width: '2rem',
+              height: '2rem',
+              background: 'rgba(232,168,73,0.06)',
+              border: '1px solid rgba(232,168,73,0.08)',
+            }}
+          >
+            <History className="w-3.5 h-3.5 text-accent" />
+          </div>
           <h3 className="text-sm font-medium text-foreground">
             Operations History
           </h3>
-          <span className="text-xs text-foreground-tertiary">
-            {total} operation{total !== 1 ? 's' : ''}
-          </span>
+          {total > 0 && (
+            <span
+              className="font-mono text-[11px] tabular-nums text-foreground-tertiary"
+              style={{
+                background: 'rgba(255,255,255,0.03)',
+                border: '1px solid rgba(255,255,255,0.06)',
+                padding: '0.125rem 0.5rem',
+                borderRadius: '9999px',
+              }}
+            >
+              {total}
+            </span>
+          )}
         </div>
-        {expanded ? (
-          <ChevronUp className="w-4 h-4 text-foreground-tertiary" />
-        ) : (
-          <ChevronDown className="w-4 h-4 text-foreground-tertiary" />
-        )}
+        <div
+          className="rounded-lg flex items-center justify-center"
+          style={{
+            width: '1.75rem',
+            height: '1.75rem',
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid rgba(255,255,255,0.06)',
+          }}
+        >
+          {expanded ? (
+            <ChevronUp className="w-3.5 h-3.5 text-foreground-tertiary" />
+          ) : (
+            <ChevronDown className="w-3.5 h-3.5 text-foreground-tertiary" />
+          )}
+        </div>
       </button>
 
       <AnimatePresence>
@@ -101,18 +135,31 @@ export function OperationsHistory({
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
           >
+            <div
+              style={{
+                height: '1px',
+                background: 'linear-gradient(to right, transparent 0%, rgba(255,255,255,0.06) 20%, rgba(255,255,255,0.06) 80%, transparent 100%)',
+              }}
+            />
+
             {isLoading ? (
-              <div className="py-8 text-center text-sm text-foreground-tertiary">
+              <div
+                className="text-center text-sm text-foreground-tertiary"
+                style={{ padding: '2rem 1rem' }}
+              >
                 Loading history...
               </div>
             ) : items.length === 0 ? (
-              <div className="py-8 text-center text-sm text-foreground-tertiary">
-                No operations yet. Preview and organize files to see history here.
+              <div
+                className="text-center text-sm text-foreground-tertiary"
+                style={{ padding: '2rem 1rem' }}
+              >
+                No operations yet. Organize files to see history here.
               </div>
             ) : (
               <>
                 {/* Operations List */}
-                <div className="max-h-80 overflow-y-auto divide-y divide-border-subtle">
+                <div className="max-h-80 overflow-y-auto custom-scrollbar">
                   {items.map((op) => (
                     <OperationRow
                       key={op.id}
@@ -125,26 +172,41 @@ export function OperationsHistory({
 
                 {/* Pagination */}
                 {totalPages > 1 && (
-                  <div className="flex items-center justify-between px-4 py-3 border-t border-border-subtle">
-                    <span className="text-xs text-foreground-tertiary">
+                  <div
+                    className="flex items-center justify-between border-t border-border-subtle"
+                    style={{ padding: '0.75rem 1rem' }}
+                  >
+                    <span className="text-xs text-foreground-tertiary font-mono tabular-nums">
                       Page {page} of {totalPages}
                     </span>
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => onPageChange(page - 1)}
                         disabled={page <= 1}
-                        className="p-1.5 rounded-md hover:bg-surface-tertiary transition-colors
+                        className="rounded-lg flex items-center justify-center
+                                   hover:bg-surface-tertiary transition-colors
                                    disabled:opacity-30 disabled:cursor-not-allowed"
+                        style={{
+                          width: '1.75rem',
+                          height: '1.75rem',
+                          border: '1px solid rgba(255,255,255,0.06)',
+                        }}
                       >
-                        <ChevronLeft className="w-4 h-4 text-foreground-tertiary" />
+                        <ChevronLeft className="w-3.5 h-3.5 text-foreground-tertiary" />
                       </button>
                       <button
                         onClick={() => onPageChange(page + 1)}
                         disabled={page >= totalPages}
-                        className="p-1.5 rounded-md hover:bg-surface-tertiary transition-colors
+                        className="rounded-lg flex items-center justify-center
+                                   hover:bg-surface-tertiary transition-colors
                                    disabled:opacity-30 disabled:cursor-not-allowed"
+                        style={{
+                          width: '1.75rem',
+                          height: '1.75rem',
+                          border: '1px solid rgba(255,255,255,0.06)',
+                        }}
                       >
-                        <ChevronRight className="w-4 h-4 text-foreground-tertiary" />
+                        <ChevronRight className="w-3.5 h-3.5 text-foreground-tertiary" />
                       </button>
                     </div>
                   </div>
@@ -181,9 +243,22 @@ function OperationRow({
     : '';
 
   return (
-    <div className="group flex items-center gap-3 px-4 py-2.5 hover:bg-surface-tertiary/30 transition-colors">
+    <div
+      className="group flex items-center gap-3 hover:bg-surface-tertiary/20 transition-colors"
+      style={{ padding: '0.625rem 1rem', borderBottom: '1px solid rgba(255,255,255,0.03)' }}
+    >
       {/* Operation Icon */}
-      <OpIcon className="w-3.5 h-3.5 text-foreground-tertiary shrink-0" />
+      <div
+        className="rounded flex items-center justify-center shrink-0"
+        style={{
+          width: '1.5rem',
+          height: '1.5rem',
+          background: 'rgba(255,255,255,0.03)',
+          border: '1px solid rgba(255,255,255,0.06)',
+        }}
+      >
+        <OpIcon className="w-3 h-3 text-foreground-tertiary" />
+      </div>
 
       {/* Info */}
       <div className="min-w-0 flex-1">
@@ -192,7 +267,7 @@ function OperationRow({
             {operationLabels[operation.operation] ?? operation.operation}
           </span>
           <StatusIcon className={`w-3 h-3 ${statusColors[operation.status] ?? 'text-foreground-tertiary'}`} />
-          <span className="text-[11px] text-foreground-tertiary">{timeStr}</span>
+          <span className="text-[11px] text-foreground-tertiary font-mono tabular-nums">{timeStr}</span>
         </div>
         <p className="text-[11px] font-mono text-foreground-tertiary truncate mt-0.5">
           {shortenPath(operation.sourcePath)}
@@ -210,9 +285,14 @@ function OperationRow({
         <button
           onClick={onUndo}
           disabled={isUndoing}
-          className="shrink-0 opacity-0 group-hover:opacity-100 p-1.5 rounded-md
+          className="shrink-0 opacity-0 group-hover:opacity-100 rounded-lg flex items-center justify-center
                      hover:bg-warning/10 text-foreground-tertiary hover:text-warning
                      transition-all duration-200 disabled:opacity-40"
+          style={{
+            width: '1.75rem',
+            height: '1.75rem',
+            border: '1px solid rgba(255,255,255,0.06)',
+          }}
           title="Undo this operation"
         >
           <Undo2 className="w-3.5 h-3.5" />

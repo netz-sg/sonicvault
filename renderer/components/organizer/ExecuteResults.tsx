@@ -42,7 +42,8 @@ export function ExecuteResults({
       variants={stagger}
       initial="hidden"
       animate="show"
-      className="space-y-4"
+      className="flex flex-col"
+      style={{ gap: '1rem' }}
     >
       {/* Execute Result */}
       {result && (
@@ -50,23 +51,46 @@ export function ExecuteResults({
           {/* Summary Banner */}
           <motion.div
             variants={fadeUp}
-            className={`rounded-xl border p-5 ${
+            className={`relative rounded-xl border overflow-hidden ${
               result.completed > 0
-                ? 'border-success/20 bg-success/5'
-                : 'border-border-subtle bg-surface-secondary'
+                ? 'border-success/20'
+                : 'border-border-subtle'
             }`}
+            style={{
+              background: 'linear-gradient(180deg, #111115 0%, #0E0E12 100%)',
+              padding: '1.25rem',
+            }}
           >
+            {result.completed > 0 && (
+              <div
+                className="absolute left-0 top-0 bottom-0"
+                style={{
+                  width: '3px',
+                  background: 'linear-gradient(to bottom, rgba(34,197,94,0.5) 0%, rgba(34,197,94,0.1) 100%)',
+                }}
+              />
+            )}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <CheckCircle2
-                  className={`w-5 h-5 ${result.completed > 0 ? 'text-success' : 'text-foreground-tertiary'}`}
-                />
+                <div
+                  className="rounded-lg flex items-center justify-center shrink-0"
+                  style={{
+                    width: '2.25rem',
+                    height: '2.25rem',
+                    background: result.completed > 0 ? 'rgba(34,197,94,0.06)' : 'rgba(255,255,255,0.03)',
+                    border: result.completed > 0 ? '1px solid rgba(34,197,94,0.1)' : '1px solid rgba(255,255,255,0.06)',
+                  }}
+                >
+                  <CheckCircle2
+                    className={`w-4 h-4 ${result.completed > 0 ? 'text-success' : 'text-foreground-tertiary'}`}
+                  />
+                </div>
                 <div>
                   <h3 className="text-sm font-medium text-foreground">
                     Organization complete
                   </h3>
                   <p className="text-xs text-foreground-secondary mt-0.5">
-                    {result.completed} file{result.completed !== 1 ? 's' : ''} organized successfully
+                    <span className="font-mono tabular-nums">{result.completed}</span> file{result.completed !== 1 ? 's' : ''} organized successfully
                   </p>
                 </div>
               </div>
@@ -76,10 +100,11 @@ export function ExecuteResults({
                 <button
                   onClick={() => onUndo(operationIds)}
                   disabled={isUndoing}
-                  className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs font-medium
+                  className="inline-flex items-center gap-1.5 h-8 rounded-lg text-xs font-medium
                              bg-surface-tertiary text-foreground border border-border-subtle
                              hover:border-warning/30 hover:text-warning transition-all duration-200
                              disabled:opacity-40 disabled:cursor-not-allowed"
+                  style={{ padding: '0 0.75rem' }}
                 >
                   <Undo2 className="w-3.5 h-3.5" />
                   {isUndoing ? 'Undoing...' : 'Undo All'}
@@ -115,15 +140,23 @@ export function ExecuteResults({
           {result.errors.length > 0 && (
             <motion.div
               variants={fadeUp}
-              className="rounded-xl border border-error/20 bg-error/5 p-5"
+              className="relative rounded-xl border border-error/20 overflow-hidden"
+              style={{ background: 'rgba(239,68,68,0.03)', padding: '1.25rem' }}
             >
+              <div
+                className="absolute left-0 top-0 bottom-0"
+                style={{
+                  width: '3px',
+                  background: 'linear-gradient(to bottom, rgba(239,68,68,0.5) 0%, rgba(239,68,68,0.1) 100%)',
+                }}
+              />
               <div className="flex items-center gap-2 mb-3">
                 <AlertCircle className="w-4 h-4 text-error" />
                 <h4 className="text-sm font-medium text-error">
                   {result.errors.length} error{result.errors.length !== 1 ? 's' : ''}
                 </h4>
               </div>
-              <div className="space-y-1.5 max-h-40 overflow-y-auto">
+              <div className="flex flex-col gap-1.5 max-h-40 overflow-y-auto custom-scrollbar">
                 {result.errors.map((err, i) => (
                   <div key={i} className="text-xs text-foreground-secondary">
                     <span className="font-mono text-foreground-tertiary">
@@ -142,19 +175,44 @@ export function ExecuteResults({
       {undoResult && (
         <motion.div
           variants={fadeUp}
-          className={`rounded-xl border p-5 ${
+          className={`relative rounded-xl border overflow-hidden ${
             undoResult.undone > 0
-              ? 'border-warning/20 bg-warning/5'
-              : 'border-border-subtle bg-surface-secondary'
+              ? 'border-warning/20'
+              : 'border-border-subtle'
           }`}
+          style={{
+            background: 'linear-gradient(180deg, #111115 0%, #0E0E12 100%)',
+            padding: '1.25rem',
+          }}
         >
+          {undoResult.undone > 0 && (
+            <div
+              className="absolute left-0 top-0 bottom-0"
+              style={{
+                width: '3px',
+                background: 'linear-gradient(to bottom, rgba(234,179,8,0.5) 0%, rgba(234,179,8,0.1) 100%)',
+              }}
+            />
+          )}
           <div className="flex items-center gap-3">
-            <Undo2 className={`w-5 h-5 ${undoResult.undone > 0 ? 'text-warning' : 'text-foreground-tertiary'}`} />
+            <div
+              className="rounded-lg flex items-center justify-center shrink-0"
+              style={{
+                width: '2.25rem',
+                height: '2.25rem',
+                background: undoResult.undone > 0 ? 'rgba(234,179,8,0.06)' : 'rgba(255,255,255,0.03)',
+                border: undoResult.undone > 0 ? '1px solid rgba(234,179,8,0.1)' : '1px solid rgba(255,255,255,0.06)',
+              }}
+            >
+              <Undo2 className={`w-4 h-4 ${undoResult.undone > 0 ? 'text-warning' : 'text-foreground-tertiary'}`} />
+            </div>
             <div>
               <h3 className="text-sm font-medium text-foreground">Undo complete</h3>
               <p className="text-xs text-foreground-secondary mt-0.5">
-                {undoResult.undone} operation{undoResult.undone !== 1 ? 's' : ''} reversed
-                {undoResult.failed > 0 && `, ${undoResult.failed} failed`}
+                <span className="font-mono tabular-nums">{undoResult.undone}</span> operation{undoResult.undone !== 1 ? 's' : ''} reversed
+                {undoResult.failed > 0 && (
+                  <>, <span className="font-mono tabular-nums">{undoResult.failed}</span> failed</>
+                )}
               </p>
             </div>
           </div>
@@ -178,11 +236,24 @@ function StatCard({
   error?: boolean;
 }) {
   return (
-    <div className="rounded-xl bg-surface-secondary border border-border-subtle p-4">
+    <div
+      className="rounded-xl border border-border-subtle"
+      style={{ background: 'linear-gradient(180deg, #111115 0%, #0E0E12 100%)', padding: '1rem' }}
+    >
       <div className="flex items-center gap-2 mb-2">
-        <Icon className={`w-4 h-4 ${
-          error ? 'text-error' : accent ? 'text-accent' : 'text-foreground-tertiary'
-        }`} />
+        <div
+          className="rounded flex items-center justify-center"
+          style={{
+            width: '1.5rem',
+            height: '1.5rem',
+            background: error ? 'rgba(239,68,68,0.06)' : accent ? 'rgba(232,168,73,0.06)' : 'rgba(255,255,255,0.03)',
+            border: error ? '1px solid rgba(239,68,68,0.08)' : accent ? '1px solid rgba(232,168,73,0.08)' : '1px solid rgba(255,255,255,0.06)',
+          }}
+        >
+          <Icon className={`w-3 h-3 ${
+            error ? 'text-error' : accent ? 'text-accent/60' : 'text-foreground-tertiary'
+          }`} />
+        </div>
         <span className="text-xs text-foreground-tertiary">{label}</span>
       </div>
       <p className={`text-2xl font-mono font-semibold tabular-nums ${

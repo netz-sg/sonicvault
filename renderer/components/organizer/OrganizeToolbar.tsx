@@ -27,20 +27,27 @@ export function OrganizeToolbar({
   const isBusy = isEnriching || isOrganizing;
 
   return (
-    <div className="rounded-xl border border-border-subtle bg-surface-secondary p-4">
+    <div
+      className="rounded-xl border border-border-subtle overflow-hidden"
+      style={{
+        background: 'linear-gradient(180deg, #111115 0%, #0E0E12 100%)',
+        padding: '1rem',
+      }}
+    >
       <div className="flex flex-wrap items-center justify-between gap-4">
         {/* Left: Duplicate Strategy */}
-        <div className="space-y-1.5">
-          <label className="text-xs text-foreground-tertiary font-medium uppercase tracking-wider">
+        <div className="flex flex-col gap-1.5">
+          <label className="text-[10px] text-foreground-tertiary font-medium uppercase tracking-widest">
             Duplicates
           </label>
           <select
             value={duplicateStrategy}
             onChange={(e) => onDuplicateStrategyChange(e.target.value as DuplicateStrategy)}
             disabled={isBusy}
-            className="h-9 rounded-lg bg-surface-tertiary border border-border-subtle px-3 text-sm text-foreground
+            className="h-9 rounded-lg bg-surface-tertiary border border-border-subtle text-sm text-foreground
                        focus:outline-none focus:ring-1 focus:ring-accent/50 cursor-pointer
                        disabled:opacity-40 disabled:cursor-not-allowed"
+            style={{ padding: '0 0.75rem' }}
           >
             <option value="skip">Skip existing</option>
             <option value="overwrite">Overwrite</option>
@@ -54,10 +61,11 @@ export function OrganizeToolbar({
           <button
             onClick={onEnrich}
             disabled={isBusy || pendingEnrichment === 0}
-            className="inline-flex items-center gap-2 h-9 px-4 rounded-lg text-sm font-medium
+            className="inline-flex items-center gap-2 h-9 rounded-lg text-sm font-medium
                        bg-accent/10 text-accent border border-accent/20
                        hover:bg-accent/20 hover:border-accent/40 transition-all duration-200
                        disabled:opacity-40 disabled:cursor-not-allowed"
+            style={{ padding: '0 1rem' }}
           >
             {isEnriching ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -71,11 +79,14 @@ export function OrganizeToolbar({
           <button
             onClick={onOrganizeAll}
             disabled={isBusy || trackCount === 0}
-            className="inline-flex items-center gap-2 h-9 px-5 rounded-lg text-sm font-medium
+            className="inline-flex items-center gap-2 h-9 rounded-lg text-sm font-medium
                        bg-accent text-surface border border-accent
                        hover:bg-accent-dark transition-all duration-200
-                       disabled:opacity-40 disabled:cursor-not-allowed
-                       shadow-[0_0_12px_var(--accent-glow)]"
+                       disabled:opacity-40 disabled:cursor-not-allowed"
+            style={{
+              padding: '0 1.25rem',
+              boxShadow: '0 0 12px rgba(232,168,73,0.15)',
+            }}
           >
             {isOrganizing ? (
               <Loader2 className="w-4 h-4 animate-spin" />

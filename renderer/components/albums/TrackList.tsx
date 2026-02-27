@@ -48,18 +48,36 @@ export function TrackList({
 
   return (
     <div>
-      <h2 className="font-heading text-xl text-foreground mb-4">
-        Tracks
-      </h2>
+      {/* Section header with count badge */}
+      <div className="flex items-center" style={{ gap: '0.75rem', marginBottom: '1rem' }}>
+        <h2 className="font-heading text-xl text-foreground">Tracks</h2>
+        <span
+          className="font-mono text-[11px] tabular-nums text-foreground-tertiary rounded-md"
+          style={{
+            padding: '0.2rem 0.5rem',
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid rgba(255,255,255,0.06)',
+            marginTop: '0.15rem',
+          }}
+        >
+          {tracks.length}
+        </span>
+      </div>
 
-      <div className="rounded-xl border border-border-subtle bg-surface-secondary overflow-hidden">
+      <div
+        className="rounded-xl border border-border-subtle overflow-hidden"
+        style={{ background: 'linear-gradient(180deg, #111115 0%, #0E0E12 100%)' }}
+      >
         {/* Table Header */}
-        <div className="flex items-center gap-3 px-4 py-2.5 border-b border-border-subtle text-[11px] uppercase
-                        tracking-wider text-foreground-tertiary font-medium">
-          <span className="w-8 text-center">#</span>
+        <div
+          className="flex items-center border-b border-border-subtle text-[10px] uppercase
+                      tracking-widest text-foreground-tertiary font-medium"
+          style={{ padding: '0.625rem 1rem', gap: '0.75rem' }}
+        >
+          <span style={{ width: '2rem' }} className="text-center">#</span>
           <span className="flex-1">Title</span>
-          <span className="w-16 text-right hidden sm:block">Duration</span>
-          <span className="w-6" />
+          <span style={{ width: '4rem' }} className="text-right hidden sm:block">Duration</span>
+          <span style={{ width: '1.5rem' }} />
         </div>
 
         <motion.div variants={stagger} initial="hidden" animate="show">
@@ -67,8 +85,14 @@ export function TrackList({
             <div key={group.disc}>
               {/* Disc header */}
               {hasMultipleDiscs && (
-                <div className="px-4 py-2 bg-surface-tertiary/50 border-b border-border-subtle">
-                  <span className="text-[11px] uppercase tracking-wider text-foreground-tertiary font-medium">
+                <div
+                  className="border-b border-border-subtle"
+                  style={{
+                    padding: '0.5rem 1rem',
+                    background: 'rgba(255,255,255,0.015)',
+                  }}
+                >
+                  <span className="text-[10px] uppercase tracking-widest text-foreground-tertiary font-medium">
                     Disc {group.disc}
                   </span>
                 </div>
@@ -84,17 +108,25 @@ export function TrackList({
                     <motion.button
                       variants={fadeIn}
                       onClick={() => onSelectTrack(track.id)}
-                      className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors duration-150
+                      className={`w-full flex items-center text-left transition-all duration-150
                                   ${!isSelected ? 'border-b border-border-subtle' : ''}
                                   ${isSelected
-                                    ? 'bg-accent/5 border-l-2 border-l-accent'
-                                    : 'hover:bg-surface-tertiary/30 border-l-2 border-l-transparent'
+                                    ? 'bg-accent/5'
+                                    : 'hover:bg-surface-tertiary/30'
                                   }`}
+                      style={{
+                        padding: '0.625rem 1rem',
+                        gap: '0.75rem',
+                        borderLeft: isSelected ? '3px solid var(--color-accent)' : '3px solid transparent',
+                      }}
                     >
                       {/* Track number */}
-                      <span className={`w-8 text-center text-xs font-mono tabular-nums shrink-0 ${
-                        isSelected ? 'text-accent' : 'text-foreground-tertiary'
-                      }`}>
+                      <span
+                        className={`text-center text-xs font-mono tabular-nums shrink-0 ${
+                          isSelected ? 'text-accent' : 'text-foreground-tertiary'
+                        }`}
+                        style={{ width: '2rem' }}
+                      >
                         {track.trackNumber || '-'}
                       </span>
 
@@ -106,7 +138,7 @@ export function TrackList({
                           {track.title}
                         </span>
                         {track.fileFormat && (
-                          <span className="text-[10px] text-foreground-tertiary uppercase">
+                          <span className="text-[10px] text-foreground-tertiary font-mono uppercase tracking-wide">
                             {track.fileFormat}
                             {track.bitrate ? ` ${Math.round(track.bitrate / 1000)}k` : ''}
                           </span>
@@ -114,14 +146,21 @@ export function TrackList({
                       </div>
 
                       {/* Duration */}
-                      <span className="w-16 text-right text-xs text-foreground-tertiary font-mono tabular-nums hidden sm:block">
+                      <span
+                        className="text-right text-xs text-foreground-tertiary font-mono tabular-nums hidden sm:block"
+                        style={{ width: '4rem' }}
+                      >
                         {formatDuration(track.durationMs)}
                       </span>
 
                       {/* Lyrics indicator */}
-                      <span className="w-6 flex justify-center">
+                      <span className="flex justify-center" style={{ width: '1.5rem' }}>
                         {hasLyrics ? (
-                          <MessageSquareText className={`w-3.5 h-3.5 ${isSelected ? 'text-accent' : 'text-accent/60'}`} />
+                          <MessageSquareText
+                            className={`w-3.5 h-3.5 transition-colors ${
+                              isSelected ? 'text-accent' : 'text-accent/40'
+                            }`}
+                          />
                         ) : (
                           <span className="w-3.5" />
                         )}
@@ -153,7 +192,7 @@ export function TrackList({
   );
 }
 
-// ── Inline Lyrics Component ──
+// -- Inline Lyrics Component --
 
 interface LyricsResponse {
   plain: string | null;
@@ -171,10 +210,26 @@ function InlineLyrics({ trackId }: { trackId: string }) {
   const lyrics = data?.synced || data?.plain;
 
   return (
-    <div className="bg-surface-tertiary/20 border-l-2 border-l-accent px-4 py-4 ml-0">
-      <div className="pl-11">
+    <div
+      className="relative"
+      style={{
+        padding: '1rem 1rem 1rem 0',
+        marginLeft: '3px',
+        background: 'rgba(232,168,73,0.02)',
+      }}
+    >
+      {/* Left accent bar */}
+      <div
+        className="absolute left-0 top-0 bottom-0"
+        style={{
+          width: '2px',
+          background: 'linear-gradient(to bottom, rgba(232,168,73,0.4) 0%, rgba(232,168,73,0.1) 100%)',
+        }}
+      />
+
+      <div style={{ paddingLeft: '3.5rem' }}>
         {isLoading ? (
-          <div className="flex items-center gap-2 py-4 text-foreground-tertiary">
+          <div className="flex items-center gap-2 py-3 text-foreground-tertiary">
             <Loader2 className="w-3.5 h-3.5 animate-spin" />
             <span className="text-xs">Loading lyrics...</span>
           </div>
@@ -194,7 +249,7 @@ function InlineLyrics({ trackId }: { trackId: string }) {
   );
 }
 
-// ── Helpers ──
+// -- Helpers --
 
 function formatLyrics(text: string): string {
   return text.replace(/\[\d{2}:\d{2}\.\d{2,3}\]\s?/g, '').trim();

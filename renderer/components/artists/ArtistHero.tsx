@@ -37,8 +37,8 @@ export function ArtistHero({
 }: ArtistHeroProps) {
   return (
     <div className="relative">
-      {/* Background Banner */}
-      <div className="relative h-48 sm:h-64 rounded-2xl overflow-hidden bg-surface-tertiary">
+      {/* Background Banner — cinematic with multi-stop gradient */}
+      <div className="relative overflow-hidden rounded-2xl" style={{ height: '18rem' }}>
         {backgroundUrl ? (
           <img
             src={backgroundUrl}
@@ -49,43 +49,110 @@ export function ArtistHero({
           <img
             src={imageUrl}
             alt=""
-            className="w-full h-full object-cover blur-2xl scale-110 opacity-30"
+            className="w-full h-full object-cover blur-3xl scale-125 opacity-25"
           />
-        ) : null}
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-linear-to-t from-surface via-surface/60 to-transparent" />
+        ) : (
+          <div
+            className="w-full h-full"
+            style={{
+              background: 'linear-gradient(135deg, #1A1A21 0%, #111115 40%, rgba(232,168,73,0.04) 100%)',
+            }}
+          />
+        )}
+
+        {/* Multi-stop cinematic gradient overlay */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `linear-gradient(
+              to top,
+              #0A0A0C 0%,
+              rgba(10,10,12,0.95) 15%,
+              rgba(10,10,12,0.6) 40%,
+              rgba(10,10,12,0.3) 65%,
+              rgba(10,10,12,0.15) 100%
+            )`,
+          }}
+        />
+
+        {/* Subtle warm tint at top edge */}
+        <div
+          className="absolute inset-x-0 top-0 pointer-events-none"
+          style={{
+            height: '30%',
+            background: 'linear-gradient(to bottom, rgba(232,168,73,0.03) 0%, transparent 100%)',
+          }}
+        />
       </div>
 
       {/* Content overlapping the banner */}
-      <div className="relative -mt-20 px-2 sm:px-4">
-        <div className="flex flex-col sm:flex-row items-start" style={{ gap: '1.25rem' }}>
+      <div className="relative" style={{ marginTop: '-5rem', paddingLeft: '1rem', paddingRight: '1rem' }}>
+        <div className="flex flex-col sm:flex-row items-start" style={{ gap: '1.5rem' }}>
           {/* Artist Image */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.92 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4 }}
-            className="shrink-0 w-32 h-32 sm:w-40 sm:h-40 rounded-2xl overflow-hidden border-4 border-surface
-                       bg-surface-secondary shadow-[var(--shadow-deep)]"
+            transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+            className="shrink-0 rounded-2xl overflow-hidden"
+            style={{
+              width: '10rem',
+              height: '10rem',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 0 2px rgba(255,255,255,0.04), 0 0 20px rgba(232,168,73,0.06)',
+            }}
           >
             {imageUrl ? (
               <img src={imageUrl} alt={name} className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-surface-tertiary">
-                <Mic2 className="w-12 h-12 text-foreground-tertiary/30" />
+              <div
+                className="w-full h-full flex items-center justify-center"
+                style={{
+                  background: 'linear-gradient(135deg, #1A1A21 0%, #111115 50%, #1A1A21 100%)',
+                }}
+              >
+                <div
+                  className="rounded-full flex items-center justify-center"
+                  style={{
+                    width: '4rem',
+                    height: '4rem',
+                    background: 'rgba(232,168,73,0.06)',
+                    border: '1px solid rgba(232,168,73,0.08)',
+                  }}
+                >
+                  <Mic2 className="w-8 h-8 text-accent/25" />
+                </div>
               </div>
             )}
           </motion.div>
 
           {/* Info */}
-          <div className="flex-1 min-w-0 pt-2">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="flex-1 min-w-0"
+            style={{ paddingTop: '2.5rem' }}
+          >
             <div className="flex items-start justify-between gap-3">
               <div>
+                {/* Type badge */}
                 {type && (
-                  <span className="text-[11px] uppercase tracking-wider text-foreground-tertiary font-medium">
+                  <span
+                    className="inline-block text-[10px] uppercase tracking-widest font-medium text-foreground-tertiary rounded"
+                    style={{
+                      padding: '0.15rem 0.5rem',
+                      background: 'rgba(255,255,255,0.03)',
+                      border: '1px solid rgba(255,255,255,0.06)',
+                      marginBottom: '0.5rem',
+                    }}
+                  >
                     {type}
                   </span>
                 )}
-                <h1 className="font-heading text-3xl sm:text-4xl text-foreground tracking-tight">
+
+                <h1
+                  className="font-heading text-foreground tracking-tight"
+                  style={{ fontSize: '2.5rem', lineHeight: 1.1 }}
+                >
                   {name}
                 </h1>
               </div>
@@ -94,35 +161,62 @@ export function ArtistHero({
               <button
                 onClick={onRefresh}
                 disabled={isRefreshing}
-                className="shrink-0 p-2 rounded-lg bg-surface-secondary border border-border-subtle
+                className="shrink-0 rounded-lg bg-surface-secondary border border-border-subtle
                            text-foreground-tertiary hover:text-accent hover:border-accent/30 transition-all
                            disabled:opacity-40 disabled:cursor-not-allowed"
+                style={{ padding: '0.5rem' }}
                 title="Re-fetch metadata for this artist"
               >
                 <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
               </button>
             </div>
 
-            {/* Meta */}
-            <div className="flex flex-wrap items-center gap-4 mt-2 text-xs text-foreground-secondary">
+            {/* Meta row */}
+            <div className="flex flex-wrap items-center mt-3" style={{ gap: '0.75rem' }}>
               {country && (
-                <span className="flex items-center gap-1">
-                  <MapPin className="w-3 h-3" /> {country}
+                <span className="flex items-center gap-1 text-xs text-foreground-secondary">
+                  <MapPin className="w-3 h-3 text-foreground-tertiary" />
+                  {country}
                 </span>
               )}
               {beginDate && (
-                <span className="flex items-center gap-1">
-                  <Calendar className="w-3 h-3" />
-                  {beginDate}{endDate ? ` — ${endDate}` : ''}
+                <span className="flex items-center gap-1 text-xs text-foreground-secondary">
+                  <Calendar className="w-3 h-3 text-foreground-tertiary" />
+                  <span className="font-mono tabular-nums">
+                    {beginDate}{endDate ? ` — ${endDate}` : ''}
+                  </span>
                 </span>
               )}
-              <span className="flex items-center gap-1">
-                <Disc3 className="w-3 h-3" />
-                {albumCount} album{albumCount !== 1 ? 's' : ''}
+
+              {/* Separator dot before stats */}
+              {(country || beginDate) && (
+                <span className="text-foreground-tertiary/30">|</span>
+              )}
+
+              {/* Stat chips */}
+              <span
+                className="inline-flex items-center gap-1 text-xs text-foreground-secondary rounded"
+                style={{
+                  padding: '0.15rem 0.5rem',
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                }}
+              >
+                <Disc3 className="w-3 h-3 text-foreground-tertiary" />
+                <span className="font-mono tabular-nums">{albumCount}</span>
+                <span className="text-foreground-tertiary">album{albumCount !== 1 ? 's' : ''}</span>
               </span>
-              <span className="flex items-center gap-1">
-                <Music className="w-3 h-3" />
-                {trackCount} track{trackCount !== 1 ? 's' : ''}
+              <span
+                className="inline-flex items-center gap-1 text-xs text-foreground-secondary rounded"
+                style={{
+                  padding: '0.15rem 0.5rem',
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                }}
+              >
+                <Music className="w-3 h-3 text-foreground-tertiary" />
+                <span className="font-mono tabular-nums">{trackCount}</span>
+                <span className="text-foreground-tertiary">track{trackCount !== 1 ? 's' : ''}</span>
               </span>
             </div>
 
@@ -134,18 +228,37 @@ export function ArtistHero({
                 ))}
               </div>
             )}
-          </div>
+          </motion.div>
         </div>
 
         {/* Biography */}
         {biography && (
           <motion.div
-            initial={{ opacity: 0, y: 8 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.4 }}
-            className="mt-6 rounded-xl bg-surface-secondary/50 border border-border-subtle p-5"
+            transition={{ delay: 0.25, duration: 0.4 }}
+            className="relative rounded-xl overflow-hidden"
+            style={{
+              marginTop: '1.5rem',
+              padding: '1rem 1.25rem',
+              background: 'rgba(255,255,255,0.015)',
+              border: '1px solid rgba(255,255,255,0.04)',
+            }}
           >
-            <h2 className="text-xs uppercase tracking-wider text-foreground-tertiary font-medium mb-2">
+            {/* Left accent bar */}
+            <div
+              className="absolute left-0 top-0 bottom-0"
+              style={{
+                width: '3px',
+                background: 'linear-gradient(to bottom, rgba(232,168,73,0.5) 0%, rgba(232,168,73,0.1) 100%)',
+                borderRadius: '0 2px 2px 0',
+              }}
+            />
+
+            <h2
+              className="text-[10px] uppercase tracking-widest text-foreground-tertiary font-medium"
+              style={{ marginBottom: '0.5rem' }}
+            >
               Biography
             </h2>
             <p className="text-sm text-foreground-secondary leading-relaxed line-clamp-6">

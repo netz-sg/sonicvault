@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Mic2 } from 'lucide-react';
+import { Mic2, Disc3, Music } from 'lucide-react';
 
 interface ArtistCardProps {
   id: string;
@@ -28,64 +28,103 @@ export function ArtistCard({
   return (
     <Link href={`/artists/${id}`}>
       <motion.div
-        whileHover={{ y: -4 }}
-        transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
-        className="group relative rounded-xl border border-border-subtle bg-surface-secondary
-                   overflow-hidden cursor-pointer
-                   hover:border-accent/25 hover:shadow-[0_8px_32px_rgba(0,0,0,0.4)]
-                   transition-all duration-300"
+        whileHover={{ scale: 1.02 }}
+        transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+        className="group relative rounded-xl overflow-hidden cursor-pointer border border-border-subtle
+                   hover:border-accent/20 transition-colors duration-300"
+        style={{ background: 'linear-gradient(180deg, #111115 0%, #0E0E12 100%)' }}
       >
-        {/* Artist Image */}
+        {/* Image */}
         <div className="relative aspect-square overflow-hidden bg-surface-tertiary">
           {imageUrl ? (
             <img
               src={imageUrl}
               alt={name}
               className="w-full h-full object-cover transition-transform duration-500
-                         group-hover:scale-105"
+                         group-hover:scale-[1.06]"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center
-                            bg-linear-to-br from-surface-tertiary to-surface-elevated">
-              <Mic2 className="w-10 h-10 text-foreground-tertiary/20" />
+            <div
+              className="w-full h-full flex items-center justify-center"
+              style={{
+                background: 'linear-gradient(135deg, #1A1A21 0%, #111115 50%, #1A1A21 100%)',
+              }}
+            >
+              <div
+                className="rounded-full flex items-center justify-center"
+                style={{
+                  width: '3.5rem',
+                  height: '3.5rem',
+                  background: 'rgba(232,168,73,0.06)',
+                  border: '1px solid rgba(232,168,73,0.08)',
+                }}
+              >
+                <Mic2 className="w-6 h-6 text-accent/25" />
+              </div>
             </div>
           )}
 
-          {/* Gradient overlay on hover */}
-          <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent
-                          opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          {/* Bottom gradient fade into card body */}
+          <div
+            className="absolute inset-x-0 bottom-0 pointer-events-none"
+            style={{
+              height: '40%',
+              background: 'linear-gradient(to top, #0E0E12 0%, transparent 100%)',
+            }}
+          />
+
+          {/* Hover overlay */}
+          <div className="absolute inset-0 bg-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
           {/* Country badge */}
           {country && (
-            <span className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-md text-[10px] font-medium
-                             bg-black/50 text-foreground/80 backdrop-blur-sm border border-white/5">
+            <span
+              className="absolute top-2.5 right-2.5 rounded text-[10px] font-mono font-medium tracking-wide
+                         text-foreground/70 backdrop-blur-md"
+              style={{
+                padding: '0.2rem 0.5rem',
+                background: 'rgba(0,0,0,0.55)',
+                border: '1px solid rgba(255,255,255,0.06)',
+              }}
+            >
               {country}
             </span>
           )}
         </div>
 
         {/* Info */}
-        <div className="p-3">
+        <div style={{ padding: '0.75rem' }}>
           <h3 className="text-sm font-medium text-foreground truncate leading-tight
                          group-hover:text-accent transition-colors duration-200">
             {name}
           </h3>
 
-          <div className="flex items-center gap-1.5 mt-1.5">
-            <span className="text-xs text-foreground-tertiary tabular-nums">
-              {albumCount} {albumCount === 1 ? 'Album' : 'Albums'}
+          {/* Stats row */}
+          <div className="flex items-center mt-1.5" style={{ gap: '0.625rem' }}>
+            <span className="flex items-center gap-1 text-[11px] text-foreground-tertiary">
+              <Disc3 className="w-3 h-3" />
+              <span className="font-mono tabular-nums">{albumCount}</span>
             </span>
-            <span className="text-foreground-tertiary/30">&middot;</span>
-            <span className="text-xs text-foreground-tertiary tabular-nums">
-              {trackCount} {trackCount === 1 ? 'Track' : 'Tracks'}
+            <span className="flex items-center gap-1 text-[11px] text-foreground-tertiary">
+              <Music className="w-3 h-3" />
+              <span className="font-mono tabular-nums">{trackCount}</span>
             </span>
           </div>
 
+          {/* Genre tag */}
           {topGenre && (
-            <span className="inline-block mt-2 px-2 py-0.5 rounded-md text-[10px] font-medium
-                             bg-accent/8 text-accent/70 border border-accent/10">
-              {topGenre}
-            </span>
+            <div className="mt-2">
+              <span
+                className="inline-block rounded text-[10px] font-medium text-accent/60"
+                style={{
+                  padding: '0.15rem 0.4rem',
+                  background: 'rgba(232,168,73,0.06)',
+                  border: '1px solid rgba(232,168,73,0.08)',
+                }}
+              >
+                {topGenre}
+              </span>
+            </div>
           )}
         </div>
       </motion.div>

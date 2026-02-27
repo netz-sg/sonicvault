@@ -19,6 +19,7 @@ export function SearchInput({
   onSubmit,
 }: SearchInputProps) {
   const [internalValue, setInternalValue] = useState('');
+  const [focused, setFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const value = controlledValue ?? internalValue;
 
@@ -52,20 +53,39 @@ export function SearchInput({
     return () => document.removeEventListener('keydown', handleGlobalKeyDown);
   }, []);
 
+  const isMac = typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.userAgent);
+
   return (
-    <div className={`relative group ${className}`}>
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-tertiary group-focus-within:text-accent transition-colors" />
+    <div
+      className={`flex items-center rounded-lg border transition-all duration-200 ${
+        focused
+          ? 'bg-surface-tertiary border-accent/30 ring-1 ring-accent/10'
+          : 'bg-surface-tertiary/50 border-border-subtle'
+      } ${className}`}
+      style={{ height: '2.25rem', gap: '0.5rem', paddingLeft: '0.75rem', paddingRight: '0.75rem' }}
+      onClick={() => inputRef.current?.focus()}
+    >
+      <Search
+        className={`w-3.5 h-3.5 shrink-0 transition-colors ${
+          focused ? 'text-accent' : 'text-foreground-tertiary'
+        }`}
+      />
       <input
         ref={inputRef}
         type="text"
         value={value}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
         placeholder={placeholder}
-        className="w-full pl-10 pr-14 py-2 bg-surface-tertiary/50 border border-border-subtle rounded-lg text-sm text-foreground placeholder:text-foreground-tertiary/60 focus:outline-none focus:border-accent/30 focus:bg-surface-tertiary focus:ring-1 focus:ring-accent/10 transition-all duration-200"
+        className="flex-1 min-w-0 h-full bg-transparent text-sm text-foreground placeholder:text-foreground-tertiary/60 focus:outline-none"
       />
-      <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-surface-elevated/60 border border-border-subtle text-[10px] font-mono text-foreground-tertiary">
-        ⌘K
+      <kbd
+        className="shrink-0 inline-flex items-center px-1.5 py-0.5 rounded bg-surface-secondary border border-border-subtle text-[10px] font-mono text-foreground-tertiary"
+        style={{ gap: '0.125rem' }}
+      >
+        {isMac ? '⌘' : 'Ctrl+'}K
       </kbd>
     </div>
   );

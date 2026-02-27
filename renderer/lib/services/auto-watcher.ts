@@ -8,7 +8,7 @@
  */
 
 import { db } from '@/lib/db';
-import { sourceFolders, settings } from '@/lib/db/schema';
+import { settings } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { scanDirectory } from './scanner';
 import { enrichAll } from './enrichment';
@@ -165,36 +165,29 @@ class AutoWatcherService {
     };
 
     try {
-      // Step 1: Get source folders with autoScan enabled
-      const folders = db
-        .select()
-        .from(sourceFolders)
-        .where(eq(sourceFolders.autoScan, 1))
-        .all();
-
-      if (folders.length === 0) {
-        this.addLog('info', 'No folders with auto-scan enabled');
+      // Step 1: Get library path
+      const libraryPath = this.getSetting('library_path');
+      if (!libraryPath) {
+        this.addLog('warning', 'No library path configured — skipping');
         this.isProcessing = false;
         this.updateNextRun();
         return;
       }
 
-      // Step 2: Scan each folder
-      for (const folder of folders) {
-        try {
-          this.addLog('info', `Scanning: ${folder.path}`);
-          const scanResult = await scanDirectory(folder.path);
-          result.scanned++;
-          result.newTracks += scanResult.newTracks;
+      // Step 2: Scan library
+      try {
+        this.addLog('info', `Scanning: ${libraryPath}`);
+        const scanResult = await scanDirectory(libraryPath);
+        result.scanned = 1;
+        result.newTracks = scanResult.newTracks;
 
-          if (scanResult.newTracks > 0) {
-            this.addLog('success', `Found ${scanResult.newTracks} new tracks in ${folder.label || folder.path}`);
-          }
-        } catch (err) {
-          const msg = err instanceof Error ? err.message : 'Scan failed';
-          result.errors.push(`Scan ${folder.path}: ${msg}`);
-          this.addLog('error', `Scan failed: ${folder.label || folder.path} — ${msg}`);
+        if (scanResult.newTracks > 0) {
+          this.addLog('success', `Found ${scanResult.newTracks} new tracks`);
         }
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Scan failed';
+        result.errors.push(`Scan: ${msg}`);
+        this.addLog('error', `Scan failed: ${msg}`);
       }
 
       // Step 3: Enrich metadata (if new tracks found)
@@ -214,68 +207,58 @@ class AutoWatcherService {
         }
       }
 
-      // Step 4: Auto-organize (for folders with autoOrganize)
-      const autoOrganizeFolders = folders.filter((f) => f.autoOrganize === 1);
-      if (autoOrganizeFolders.length > 0 && result.newTracks > 0) {
+      // Step 4: Auto-organize
+      if (result.newTracks > 0) {
         try {
-          // Check if library_path is set
-          const libraryPath = this.getSetting('library_path');
-          if (!libraryPath) {
-            this.addLog('warning', 'Skipping organize — no library path configured');
-          } else {
-            this.addLog('info', 'Organizing files...');
+          this.addLog('info', 'Organizing files...');
 
-            // Preview
-            const preview = generatePreview();
-            const readyItems = preview.items.filter((i) => !i.skip);
+          const preview = generatePreview();
+          const readyItems = preview.items.filter((i) => !i.skip);
 
-            if (readyItems.length > 0) {
-              // Auto-watch always uses 'move' to avoid duplicates between source and library.
-              // Manual organize respects the organize_mode setting separately.
-              const operations = readyItems.map((item) => ({
-                trackId: item.trackId,
-                sourcePath: item.sourcePath,
-                targetPath: item.targetPath,
-                operation: 'move' as const,
-              }));
+          if (readyItems.length > 0) {
+            const operations = readyItems.map((item) => ({
+              trackId: item.trackId,
+              sourcePath: item.sourcePath,
+              targetPath: item.targetPath,
+              operation: 'move' as const,
+            }));
 
-              const execResult = executeOrganize(operations);
-              result.organized = execResult.completed;
+            const execResult = executeOrganize(operations);
+            result.organized = execResult.completed;
 
-              if (execResult.completed > 0) {
-                this.addLog('success', `Organized ${execResult.completed} files`);
-              }
+            if (execResult.completed > 0) {
+              this.addLog('success', `Organized ${execResult.completed} files`);
+            }
 
-              // Tag write
-              if (this.getSetting('auto_tag_write') === 'true') {
-                try {
-                  const tagResults = batchTagWrite([]);
-                  result.tagged = tagResults.filter((r) => r.success).length;
-                  if (result.tagged > 0) {
-                    this.addLog('success', `Tags written for ${result.tagged} tracks`);
-                  }
-                } catch {
-                  result.errors.push('Tag write failed');
+            // Tag write
+            if (this.getSetting('auto_tag_write') === 'true') {
+              try {
+                const tagResults = batchTagWrite([]);
+                result.tagged = tagResults.filter((r) => r.success).length;
+                if (result.tagged > 0) {
+                  this.addLog('success', `Tags written for ${result.tagged} tracks`);
                 }
+              } catch {
+                result.errors.push('Tag write failed');
               }
+            }
 
-              // Cover embed
-              if (this.getSetting('cover_embed') === 'true') {
-                try {
-                  batchEmbedCovers([]);
-                  copyCoversToAlbumFolders();
-                } catch {
-                  result.errors.push('Cover embed failed');
-                }
+            // Cover embed
+            if (this.getSetting('cover_embed') === 'true') {
+              try {
+                batchEmbedCovers([]);
+                copyCoversToAlbumFolders();
+              } catch {
+                result.errors.push('Cover embed failed');
               }
+            }
 
-              // NFO generation
-              if (this.getSetting('nfo_generate') === 'true') {
-                try {
-                  await generateAllNfos();
-                } catch {
-                  result.errors.push('NFO generation failed');
-                }
+            // NFO generation
+            if (this.getSetting('nfo_generate') === 'true') {
+              try {
+                await generateAllNfos();
+              } catch {
+                result.errors.push('NFO generation failed');
               }
             }
           }

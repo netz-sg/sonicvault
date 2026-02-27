@@ -8,14 +8,14 @@ import {
   Mic2,
   Disc3,
   ScanSearch,
-  ArrowRightLeft,
   Settings,
-  ChevronLeft,
-  ChevronRight,
+  PanelLeftClose,
+  PanelLeftOpen,
   Music,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useLayoutStore } from '@/lib/store/useLayoutStore';
+import { useTranslation } from '@/lib/i18n/useTranslation';
 
 interface LibraryStats {
   artists: number;
@@ -23,22 +23,22 @@ interface LibraryStats {
   tracks: number;
 }
 
-const navItems = [
-  { href: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/artists', label: 'Artists', icon: Mic2 },
-  { href: '/albums', label: 'Albums', icon: Disc3 },
-  { href: '/scan', label: 'Scanner', icon: ScanSearch },
-  { href: '/organize', label: 'Organizer', icon: ArrowRightLeft },
+const navItemDefs = [
+  { href: '/', labelKey: 'nav.dashboard', icon: LayoutDashboard },
+  { href: '/artists', labelKey: 'nav.artists', icon: Mic2 },
+  { href: '/albums', labelKey: 'nav.albums', icon: Disc3 },
+  { href: '/scan', labelKey: 'nav.scanner', icon: ScanSearch },
 ];
 
-const bottomItems = [
-  { href: '/settings', label: 'Settings', icon: Settings },
+const bottomItemDefs = [
+  { href: '/settings', labelKey: 'nav.settings', icon: Settings },
 ];
 
 export function Sidebar() {
   const collapsed = useLayoutStore((s) => s.sidebarCollapsed);
   const toggleSidebar = useLayoutStore((s) => s.toggleSidebar);
   const pathname = usePathname();
+  const { t } = useTranslation();
 
   const { data: stats } = useQuery<LibraryStats>({
     queryKey: ['sidebar-stats'],
@@ -55,75 +55,154 @@ export function Sidebar() {
     <motion.aside
       animate={{ width: collapsed ? 72 : 260 }}
       transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-      className="fixed left-0 top-0 bottom-0 z-40 flex flex-col bg-surface-secondary overflow-hidden"
+      className="fixed left-0 top-0 bottom-0 z-40 flex flex-col overflow-hidden"
+      style={{ background: 'linear-gradient(180deg, #111115 0%, #0D0D10 100%)' }}
     >
-      {/* Subtle right border gradient */}
-      <div className="absolute right-0 top-0 bottom-0 w-px bg-linear-to-b from-transparent via-border-subtle to-transparent" />
+      {/* Right edge line */}
+      <div
+        className="absolute right-0 top-0 bottom-0 w-px"
+        style={{ background: 'linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.06) 20%, rgba(255,255,255,0.06) 80%, transparent 100%)' }}
+      />
 
-      {/* ── Logo ── */}
-      <div className="flex items-center h-16 px-4 gap-3 flex-shrink-0">
-        <div className="relative flex-shrink-0 w-9 h-9 rounded-xl bg-accent/15 flex items-center justify-center">
-          <Music className="w-[18px] h-[18px] text-accent" />
-          <div className="absolute inset-0 rounded-xl bg-accent/10 animate-pulse" />
+      {/* Logo */}
+      <div
+        className="flex items-center shrink-0"
+        style={{ height: '4rem', paddingLeft: collapsed ? '0' : '1.25rem', paddingRight: '1rem', justifyContent: collapsed ? 'center' : 'flex-start', gap: '0.75rem' }}
+      >
+        <div
+          className="relative shrink-0 flex items-center justify-center rounded-xl"
+          style={{
+            width: '2.25rem',
+            height: '2.25rem',
+            background: 'linear-gradient(135deg, rgba(232,168,73,0.18) 0%, rgba(232,168,73,0.06) 100%)',
+            border: '1px solid rgba(232,168,73,0.15)',
+          }}
+        >
+          <Music className="w-4 h-4 text-accent" />
+          {/* Subtle warm inner glow instead of cheap pulse */}
+          <div
+            className="absolute inset-0 rounded-xl"
+            style={{ boxShadow: 'inset 0 1px 0 rgba(232,168,73,0.1), 0 0 12px rgba(232,168,73,0.06)' }}
+          />
         </div>
         <AnimatePresence mode="wait">
           {!collapsed && (
-            <motion.span
-              initial={{ opacity: 0, x: -8 }}
+            <motion.div
+              initial={{ opacity: 0, x: -6 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -8 }}
+              exit={{ opacity: 0, x: -6 }}
               transition={{ duration: 0.2 }}
-              className="font-heading text-xl text-foreground tracking-tight whitespace-nowrap"
+              className="flex items-baseline whitespace-nowrap"
+              style={{ gap: '0.35rem' }}
             >
-              SonicVault
-            </motion.span>
+              <span className="font-heading text-foreground" style={{ fontSize: '1.15rem', letterSpacing: '-0.01em' }}>
+                Sonic
+              </span>
+              <span className="font-heading text-accent" style={{ fontSize: '1.15rem', letterSpacing: '-0.01em' }}>
+                Vault
+              </span>
+            </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      {/* ── Main Navigation ── */}
-      <nav className="flex-1 px-3 pt-4 space-y-1 overflow-y-auto overflow-x-hidden">
-        {navItems.map((item) => (
-          <NavItem
-            key={item.href}
-            href={item.href}
-            label={item.label}
-            icon={item.icon}
-            active={isActive(item.href)}
-            collapsed={collapsed}
-          />
-        ))}
-      </nav>
-
-      {/* ── Library Stats ── */}
+      {/* Nav section label */}
       <AnimatePresence>
         {!collapsed && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="px-5 py-4 border-t border-border-subtle"
+            transition={{ duration: 0.15 }}
+            style={{ paddingLeft: '1.25rem', paddingRight: '1rem', marginBottom: '0.5rem' }}
           >
-            <p className="text-[10px] uppercase tracking-widest text-foreground-tertiary mb-3 font-medium">
-              Library
+            <span className="text-[10px] uppercase tracking-widest text-foreground-tertiary font-medium">
+              {t('nav.navigate')}
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Main Navigation */}
+      <nav
+        className="flex-1 overflow-y-auto overflow-x-hidden"
+        style={{ paddingLeft: '0.625rem', paddingRight: '0.625rem' }}
+      >
+        <div className="flex flex-col" style={{ gap: '0.125rem' }}>
+          {navItemDefs.map((item) => (
+            <NavItem
+              key={item.href}
+              href={item.href}
+              label={t(item.labelKey)}
+              icon={item.icon}
+              active={isActive(item.href)}
+              collapsed={collapsed}
+            />
+          ))}
+        </div>
+      </nav>
+
+      {/* Library Stats */}
+      <AnimatePresence>
+        {!collapsed && (
+          <motion.div
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 4 }}
+            transition={{ duration: 0.2 }}
+            style={{ margin: '0 0.75rem', padding: '0.875rem', marginBottom: '0.5rem' }}
+            className="rounded-lg"
+          >
+            <p
+              className="text-[10px] uppercase tracking-widest text-foreground-tertiary font-medium"
+              style={{ marginBottom: '0.625rem' }}
+            >
+              {t('nav.library')}
             </p>
-            <div className="space-y-2">
-              <StatRow label="Artists" value={stats?.artists ?? 0} />
-              <StatRow label="Albums" value={stats?.albums ?? 0} />
-              <StatRow label="Tracks" value={stats?.tracks ?? 0} />
+            <div className="flex flex-col" style={{ gap: '0.375rem' }}>
+              <StatRow label={t('nav.artists')} value={stats?.artists ?? 0} />
+              <StatRow label={t('nav.albums')} value={stats?.albums ?? 0} />
+              <StatRow label={t('dashboard.tracks')} value={stats?.tracks ?? 0} />
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* ── Bottom: Settings + Collapse ── */}
-      <div className="px-3 pb-2 pt-1 border-t border-border-subtle flex-shrink-0">
-        {bottomItems.map((item) => (
+      {/* Collapsed stats: single track count */}
+      <AnimatePresence>
+        {collapsed && stats && (stats.tracks > 0) && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="flex flex-col items-center"
+            style={{ marginBottom: '0.5rem' }}
+          >
+            <span className="text-[10px] font-mono text-foreground-tertiary tabular-nums">
+              {stats.tracks.toLocaleString()}
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Bottom: Settings + Collapse */}
+      <div
+        className="shrink-0 flex flex-col"
+        style={{
+          paddingLeft: '0.625rem',
+          paddingRight: '0.625rem',
+          paddingBottom: '0.625rem',
+          paddingTop: '0.5rem',
+          gap: '0.125rem',
+          borderTop: '1px solid rgba(255,255,255,0.04)',
+        }}
+      >
+        {bottomItemDefs.map((item) => (
           <NavItem
             key={item.href}
             href={item.href}
-            label={item.label}
+            label={t(item.labelKey)}
             icon={item.icon}
             active={isActive(item.href)}
             collapsed={collapsed}
@@ -131,12 +210,25 @@ export function Sidebar() {
         ))}
         <button
           onClick={toggleSidebar}
-          className="flex items-center justify-center w-full mt-1 py-2.5 rounded-lg text-foreground-tertiary hover:text-foreground-secondary transition-colors"
+          className={`
+            group relative flex items-center rounded-lg transition-all duration-200
+            text-foreground-tertiary hover:text-foreground-secondary
+            ${collapsed ? 'justify-center' : ''}
+          `}
+          style={{
+            padding: collapsed ? '0.625rem 0' : '0.625rem 0.75rem',
+            gap: '0.75rem',
+            marginTop: '0.125rem',
+          }}
         >
+          <div className="absolute inset-0 rounded-lg bg-surface-tertiary opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
           {collapsed ? (
-            <ChevronRight className="w-4 h-4" />
+            <PanelLeftOpen className="relative z-10 w-4.5 h-4.5 shrink-0" />
           ) : (
-            <ChevronLeft className="w-4 h-4" />
+            <>
+              <PanelLeftClose className="relative z-10 w-4.5 h-4.5 shrink-0" />
+              <span className="relative z-10 text-sm font-medium whitespace-nowrap">{t('nav.collapse')}</span>
+            </>
           )}
         </button>
       </div>
@@ -162,20 +254,21 @@ function NavItem({
     <Link
       href={href}
       className={`
-        group relative flex items-center gap-3 rounded-lg transition-all duration-200
-        ${collapsed ? 'px-0 py-2.5 justify-center' : 'px-3 py-2.5'}
-        ${
-          active
-            ? 'text-accent'
-            : 'text-foreground-secondary hover:text-foreground'
-        }
+        group relative flex items-center rounded-lg transition-all duration-200
+        ${collapsed ? 'justify-center' : ''}
+        ${active ? 'text-accent' : 'text-foreground-secondary hover:text-foreground'}
       `}
+      style={{
+        padding: collapsed ? '0.625rem 0' : '0.625rem 0.75rem',
+        gap: '0.75rem',
+      }}
     >
-      {/* Active indicator background */}
+      {/* Active background */}
       {active && (
         <motion.div
           layoutId="sidebar-active-bg"
-          className="absolute inset-0 rounded-lg bg-accent/10"
+          className="absolute inset-0 rounded-lg"
+          style={{ background: 'rgba(232,168,73,0.08)' }}
           transition={{ type: 'spring', bounce: 0.15, duration: 0.5 }}
         />
       )}
@@ -189,13 +282,17 @@ function NavItem({
       {active && (
         <motion.div
           layoutId="sidebar-active-bar"
-          className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-accent"
-          style={{ boxShadow: '0 0 8px var(--color-accent)' }}
+          className="absolute left-0 top-1/2 -translate-y-1/2 rounded-r-full bg-accent"
+          style={{
+            width: '3px',
+            height: '1.125rem',
+            boxShadow: '0 0 8px rgba(232,168,73,0.4)',
+          }}
           transition={{ type: 'spring', bounce: 0.15, duration: 0.5 }}
         />
       )}
 
-      <Icon className="relative z-10 w-[18px] h-[18px] flex-shrink-0" />
+      <Icon className="relative z-10 w-4.5 h-4.5 shrink-0" />
 
       <AnimatePresence mode="wait">
         {!collapsed && (
