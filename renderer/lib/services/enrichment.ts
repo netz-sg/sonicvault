@@ -13,6 +13,8 @@ import {
 } from '@/lib/api/musicbrainz';
 import { getCoverUrls, downloadCover } from '@/lib/api/coverart';
 import { getArtistImages } from '@/lib/api/fanart';
+import { getArtistImagesByMbid } from '@/lib/api/audiodb';
+import { searchArtistImage } from '@/lib/api/deezer';
 import { getLyrics, searchLyrics } from '@/lib/api/lrclib';
 import {
   getBiographyFromWikidata,
@@ -91,19 +93,44 @@ export async function enrichArtist(artistId: string): Promise<boolean> {
       updateData.biography = bio.summary;
     }
 
-    // 4. Get images from Fanart.tv and cache locally
-    const images = await getArtistImages(mbid);
-    let thumbnailUrl: string | null = images?.thumbnail ?? null;
-    let backgroundUrl: string | null = images?.background ?? null;
+    // 4. Get artist images — multi-source fallback chain
+    //    Thumbnail: Fanart.tv → TheAudioDB → Deezer → Wikipedia
+    //    Background: Fanart.tv → TheAudioDB → (blurred thumbnail in UI)
+    let thumbnailUrl: string | null = null;
+    let backgroundUrl: string | null = null;
 
-    // If no Fanart.tv image, use Wikipedia original image (full resolution, not the tiny thumbnail)
-    if (!thumbnailUrl && bio?.originalImageUrl) {
-      thumbnailUrl = bio.originalImageUrl;
-    } else if (!thumbnailUrl && bio?.thumbnailUrl) {
-      thumbnailUrl = bio.thumbnailUrl;
+    // Source 1: Fanart.tv (best quality, needs API key)
+    const fanartImages = await getArtistImages(mbid);
+    if (fanartImages?.thumbnail) thumbnailUrl = fanartImages.thumbnail;
+    if (fanartImages?.background) backgroundUrl = fanartImages.background;
+
+    // Source 2: TheAudioDB (free, no key, good quality)
+    if (!thumbnailUrl || !backgroundUrl) {
+      try {
+        const audiodbImages = await getArtistImagesByMbid(mbid);
+        if (!thumbnailUrl && audiodbImages?.thumbnail) thumbnailUrl = audiodbImages.thumbnail;
+        if (!backgroundUrl && audiodbImages?.background) backgroundUrl = audiodbImages.background;
+      } catch { /* non-critical */ }
     }
 
-    // Download and cache artist images locally + save to artist music folder
+    // Source 3: Deezer (free, no key, 1000x1000 thumbnails)
+    if (!thumbnailUrl) {
+      try {
+        const deezerImage = await searchArtistImage(artist.name);
+        if (deezerImage?.thumbnail) thumbnailUrl = deezerImage.thumbnail;
+      } catch { /* non-critical */ }
+    }
+
+    // Source 4: Wikipedia (last resort for thumbnails)
+    if (!thumbnailUrl) {
+      if (bio?.originalImageUrl) {
+        thumbnailUrl = bio.originalImageUrl;
+      } else if (bio?.thumbnailUrl) {
+        thumbnailUrl = bio.thumbnailUrl;
+      }
+    }
+
+    // Download and cache artist images locally
     if (thumbnailUrl) {
       const cached = await cacheArtistImage(thumbnailUrl, artistId, 'thumb');
       updateData.imageUrl = cached ? `/api/artists/${artistId}/image` : thumbnailUrl;
@@ -113,7 +140,7 @@ export async function enrichArtist(artistId: string): Promise<boolean> {
       updateData.backgroundUrl = cached ? `/api/artists/${artistId}/fanart` : backgroundUrl;
     }
 
-    // Also save images to the artist's music folder (for media servers)
+    // Save images to the artist's music folder (for media servers)
     saveArtistImagesToMusicFolder(artistId);
 
     updateData.metadataStatus = 'complete';

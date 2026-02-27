@@ -15,6 +15,8 @@ const API_CONFIGS: Record<string, QueueConfig> = {
   musicbrainz: { maxRequestsPerSecond: 1, maxRetries: 3, retryDelayMs: 2000 },
   coverart: { maxRequestsPerSecond: 5, maxRetries: 2, retryDelayMs: 1000 },
   fanart: { maxRequestsPerSecond: 5, maxRetries: 2, retryDelayMs: 1000 },
+  audiodb: { maxRequestsPerSecond: 3, maxRetries: 2, retryDelayMs: 1000 },
+  deezer: { maxRequestsPerSecond: 10, maxRetries: 2, retryDelayMs: 500 },
   lrclib: { maxRequestsPerSecond: 5, maxRetries: 2, retryDelayMs: 1000 },
   wikipedia: { maxRequestsPerSecond: 10, maxRetries: 2, retryDelayMs: 500 },
 };
