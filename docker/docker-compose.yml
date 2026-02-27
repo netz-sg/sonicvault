@@ -2,9 +2,8 @@
 # SonicVault — Docker Compose
 # ════════════════════════════════════════════════════════
 #
-#   1. Copy .env.example to .env
-#   2. Set MUSIC_PATH to your music folder
-#   3. docker compose up -d --build
+# MUSIC_PATH must be set — either in .env or inline:
+#   MUSIC_PATH=/your/music docker compose up -d --build
 #
 # ════════════════════════════════════════════════════════
 
@@ -18,11 +17,8 @@ services:
     ports:
       - "${PORT:-3000}:3000"
     volumes:
-      # Database & cache (internal — do not change)
       - sonicvault-data:/data
-
-      # Your music folder — ONE mount, that's it
-      - ${MUSIC_PATH}:/music
+      - ${MUSIC_PATH:?Set MUSIC_PATH to your music folder}:/music
     environment:
       - DATA_PATH=/data
       - FANART_API_KEY=${FANART_API_KEY:-}

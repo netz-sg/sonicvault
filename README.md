@@ -99,21 +99,12 @@ SonicVault enriches your library using these free, public APIs:
 ```bash
 git clone https://github.com/netz-sg/sonicvault.git
 cd sonicvault/docker
-cp .env.example .env
+MUSIC_PATH=/path/to/your/music docker compose up -d --build
 ```
 
-Edit `.env` — point `MUSIC_PATH` to your music folder:
-```env
-PORT=3000
-MUSIC_PATH=/path/to/your/music
-```
+Open `http://localhost:3000` and follow the setup wizard. All configuration happens in the browser.
 
-Start it:
-```bash
-docker compose up -d --build
-```
-
-Open `http://localhost:3000` and follow the setup wizard.
+> Replace `/path/to/your/music` with the actual path to your music folder on the host system.
 
 ### Option 2: Native (Node.js)
 
@@ -127,20 +118,7 @@ npm run db:migrate
 npm run dev
 ```
 
-Open `http://localhost:3000`. The setup wizard will guide you through configuration.
-
-### Environment Variables
-
-Create a `.env` file in the project root:
-
-```env
-# Where SonicVault stores its database and cached images
-DATA_PATH=./data
-
-# Optional API keys
-FANART_API_KEY=your_fanart_key
-ACOUSTID_API_KEY=your_acoustid_key
-```
+Open `http://localhost:3000` and follow the setup wizard.
 
 ## Configuration
 
