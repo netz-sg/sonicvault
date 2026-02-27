@@ -97,41 +97,30 @@ SonicVault enriches your library using these free, public APIs:
 ### Option 1: Docker (Recommended)
 
 ```bash
-git clone https://github.com/yourusername/sonicvault.git
+git clone https://github.com/netz-sg/sonicvault.git
 cd sonicvault/docker
 cp .env.example .env
 ```
 
-Edit `.env` with your paths:
+Edit `.env` — point `MUSIC_PATH` to your music folder:
 ```env
 PORT=3000
-LIBRARY_PATH=/path/to/your/music/library
-FANART_API_KEY=your_key_here
-```
-
-Edit `docker-compose.yml` — add your source folders as volume mounts:
-```yaml
-volumes:
-  - sonicvault-data:/data
-  - ${LIBRARY_PATH}:/music/library
-  - /path/to/downloads:/music/sources/downloads    # your music source
+MUSIC_PATH=/path/to/your/music
 ```
 
 Start it:
 ```bash
-docker compose up -d
+docker compose up -d --build
 ```
 
 Open `http://localhost:3000` and follow the setup wizard.
-
-> **Important:** Inside the app, use container paths (`/music/library`, `/music/sources/downloads`), not your host system paths.
 
 ### Option 2: Native (Node.js)
 
 **Requirements:** Node.js 20+, npm
 
 ```bash
-git clone https://github.com/yourusername/sonicvault.git
+git clone https://github.com/netz-sg/sonicvault.git
 cd sonicvault
 npm install
 npm run db:migrate
@@ -200,7 +189,7 @@ sonicvault/
 
 Contributions are welcome. Fork the repo, create a branch, and open a pull request.
 
-If you find a bug or have a feature request, [open an issue](https://github.com/yourusername/sonicvault/issues).
+If you find a bug or have a feature request, [open an issue](https://github.com/netz-sg/sonicvault/issues).
 
 ## License
 
@@ -209,5 +198,5 @@ MIT
 ---
 
 <p align="center">
-  Built with obsessive attention to music metadata by <a href="https://github.com/yourusername">@yourusername</a>
+  Built with obsessive attention to music metadata by <a href="https://github.com/netz-sg">@netz-sg</a>
 </p>
