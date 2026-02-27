@@ -37,7 +37,7 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV DATA_PATH=/data
-ENV LIBRARY_PATH=/music/library
+ENV LIBRARY_PATH=/music
 ENV HOSTNAME=0.0.0.0
 ENV PORT=3000
 
@@ -60,7 +60,7 @@ COPY docker/migrate.cjs /app/migrate.cjs
 RUN chmod +x /app/entrypoint.sh
 
 # Create data and music directories
-RUN mkdir -p /data/covers /music/library
+RUN mkdir -p /data/covers /music
 
 # Non-root user for security
 RUN addgroup --system --gid 1001 sonicvault && \
@@ -69,7 +69,6 @@ RUN addgroup --system --gid 1001 sonicvault && \
 
 USER sonicvault
 
-# Persistent volumes
 VOLUME ["/data", "/music"]
 
 EXPOSE 3000

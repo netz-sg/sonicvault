@@ -51,7 +51,7 @@ if (existsSync(migrationDir)) {
 
 // Insert default settings (OR IGNORE = skip if already exists)
 const defaults = [
-  ['library_path', process.env.LIBRARY_PATH || ''],
+  ['library_path', process.env.LIBRARY_PATH || '/music'],
   ['naming_pattern_artist', '{artist}'],
   ['naming_pattern_album', '{year} - {album}'],
   ['naming_pattern_track', '{track_number} - {title}'],
