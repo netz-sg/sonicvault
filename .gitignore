@@ -39,9 +39,9 @@ Thumbs.db
 *.swp
 *.swo
 
-# Electron
+# Electron (top-level only, NOT renderer/app/)
 release/
-app/
+/app/
 
 # AI / Claude Code
 .claude/
