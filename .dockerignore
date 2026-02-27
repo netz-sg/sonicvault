@@ -26,12 +26,12 @@ data/
 *.swp
 *.swo
 
-# Electron / Desktop build
+# Electron / Desktop build (top-level only, NOT renderer/app/)
 release/
 dist/
 build/
-app/
-main/
+/app/
+/main/
 
 # OS
 .DS_Store
