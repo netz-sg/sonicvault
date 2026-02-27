@@ -62,13 +62,6 @@ RUN chmod +x /app/entrypoint.sh
 # Create data and music directories
 RUN mkdir -p /data/covers /music
 
-# Non-root user for security
-RUN addgroup --system --gid 1001 sonicvault && \
-    adduser --system --uid 1001 --ingroup sonicvault sonicvault && \
-    chown -R sonicvault:sonicvault /data /music /app
-
-USER sonicvault
-
 VOLUME ["/data", "/music"]
 
 EXPOSE 3000
