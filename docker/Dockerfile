@@ -11,7 +11,7 @@ WORKDIR /app
 RUN apk add --no-cache python3 make g++ vips-dev
 
 COPY package.json package-lock.json* ./
-RUN npm ci
+RUN npm ci --ignore-scripts && npm rebuild better-sqlite3 sharp
 
 # ── Stage 2: Build ──
 FROM node:20-alpine AS builder
@@ -23,6 +23,9 @@ RUN apk add --no-cache python3 make g++ vips-dev
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+
+# Ensure renderer/public exists (needed for Next.js build)
+RUN mkdir -p renderer/public
 
 # Build Next.js standalone output
 RUN cd renderer && npx next build
@@ -44,6 +47,8 @@ RUN apk add --no-cache vips curl
 # Copy standalone build output
 COPY --from=builder /app/renderer/.next/standalone ./
 COPY --from=builder /app/renderer/.next/static ./renderer/.next/static
+
+# Copy public assets (if any exist)
 COPY --from=builder /app/renderer/public ./renderer/public
 
 # Copy migration SQL files
